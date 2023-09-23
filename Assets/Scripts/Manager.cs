@@ -159,6 +159,11 @@ namespace Portals
 
                 bool t = CheckRadius(p.GetComponent<Portal>().TargetSector, CamPoint);
 
+                if (d == 0f)
+                {
+                    continue;
+                }
+
                 if (d < -0.1f)
                 {
                     continue;
