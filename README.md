@@ -9,5 +9,3 @@ A better way would be to use Forge plus then edit it with blender.
 
 Download the project as a ZIP file then add it to Unity Hub.
 After it is loaded, go to Scenes and double click ImpossibleSpace.unity to load the scene.
-
-There still is a bug I have to fix then I can go to adding moving objects.
