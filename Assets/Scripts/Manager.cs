@@ -28,7 +28,7 @@ namespace Portals
         {
             SetPlanes();
 
-            PlanePos = new Vector4[50];
+            PlanePos = new Vector4[20];
 
             BlockOne = new MaterialPropertyBlock();
         }
@@ -147,7 +147,7 @@ namespace Portals
                     continue;
                 }
 
-                if (VisitedSector.Contains(p.GetComponent<Portal>().TargetSector) && d < 0.1f)
+                if (VisitedSector.Contains(p.GetComponent<Portal>().TargetSector) && d < 0f)
                 {
                     continue;
                 }

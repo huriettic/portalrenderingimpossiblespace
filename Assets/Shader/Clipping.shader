@@ -32,7 +32,7 @@ Shader "Custom/Clipping"
         half _Metallic;
         fixed4 _Color;
         int _Int = 0;
-        float4 _Plane[10];
+        float4 _Plane[20];
         half3 _Emission;
 
         // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
@@ -48,7 +48,7 @@ Shader "Custom/Clipping"
             {
                 float distance = dot(IN.worldPos, _Plane[i].xyz);
                 distance = distance + _Plane[i].w;
-                clip(distance + 0.1f);
+                clip(distance + 0.05f);
             }
             // Albedo comes from a texture tinted by color
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
