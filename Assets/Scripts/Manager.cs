@@ -77,6 +77,21 @@ namespace Portals
             }
         }
 
+        public bool CheckRadius(GameObject PSector, Vector3 ACam)
+        {
+            bool PointIn = true;
+
+            for (int e = 0; e < PSector.GetComponent<Sector>().Planes.Count; e++)
+            {
+                if (PSector.GetComponent<Sector>().Planes[e].GetDistanceToPoint(ACam) < -0.5)
+                {
+                    PointIn = false;
+                    break;
+                }
+            }
+            return PointIn;
+        }
+
         public void CheckSector()
         {
             Vector3 CamPoint = Cam.transform.position;
@@ -142,6 +157,8 @@ namespace Portals
 
                 float d = p.GetComponent<Portal>().portalPlane.GetDistanceToPoint(CamPoint);
 
+                bool t = CheckRadius(p.GetComponent<Portal>().TargetSector, CamPoint);
+
                 if (d < -0.1f)
                 {
                     continue;
@@ -152,7 +169,7 @@ namespace Portals
                     continue;
                 }
 
-                if (d < 0.3f)
+                if (t == true)
                 {
                     p.GetComponent<Portal>().Planes.Clear();
 
