@@ -6,6 +6,8 @@ Impossible space is 5D space.
 You can make your own levels with Weland then export it to a OBJ file and edit the OBJ with blender.
 Just copy how the test level works and make a level you like to test the program.
 A better way would be to use Forge plus then edit it with blender.
+I made Portals.fbx with Weland and Blender.
+It's a 3D remake of Bisqwit's 2D portal rendering tutorial level.
 
 Download the project as a ZIP file then add it to Unity Hub.
 After it is loaded, go to Scenes and double click ImpossibleSpace.unity to load the scene.
