@@ -36,6 +36,8 @@ namespace Portals
         // Update is called once per frame
         void Update()
         {
+            Player.GetComponent<Move>().Controller();
+
             CheckSector();
 
             Planes.Clear();
@@ -77,13 +79,15 @@ namespace Portals
             }
         }
 
-        public bool CheckRadius(GameObject PSector, Vector3 ACam)
+        public bool CheckRadius(GameObject PSector)
         {
+            Vector3 CamPoint = Cam.transform.position;
+
             bool PointIn = true;
 
             for (int e = 0; e < PSector.GetComponent<Sector>().Planes.Count; e++)
             {
-                if (PSector.GetComponent<Sector>().Planes[e].GetDistanceToPoint(ACam) < -0.5)
+                if (PSector.GetComponent<Sector>().Planes[e].GetDistanceToPoint(CamPoint) < -0.5)
                 {
                     PointIn = false;
                     break;
@@ -157,7 +161,7 @@ namespace Portals
 
                 float d = p.GetComponent<Portal>().portalPlane.GetDistanceToPoint(CamPoint);
 
-                bool t = CheckRadius(p.GetComponent<Portal>().TargetSector, CamPoint);
+                bool t = CheckRadius(p.GetComponent<Portal>().TargetSector);
 
                 if (d == 0f)
                 {
