@@ -163,17 +163,12 @@ namespace Portals
 
                 bool t = CheckRadius(p.GetComponent<Portal>().TargetSector);
 
-                if (d == 0f)
-                {
-                    continue;
-                }
-
                 if (d < -0.1f)
                 {
                     continue;
                 }
 
-                if (VisitedSector.Contains(p.GetComponent<Portal>().TargetSector) && d < 0f)
+                if (VisitedSector.Contains(p.GetComponent<Portal>().TargetSector) && d <= 0)
                 {
                     continue;
                 }
@@ -192,15 +187,18 @@ namespace Portals
                     continue;
                 }
 
-                p.GetComponent<Portal>().cornerout = p.GetComponent<Portal>().ClippingPlanes(p.GetComponent<Portal>().cornertp, APlanes);
-
-                if (p.GetComponent<Portal>().cornerout.Count > 2)
+                if (d != 0)
                 {
-                    p.GetComponent<Portal>().Planes.Clear();
+                    p.GetComponent<Portal>().cornerout = p.GetComponent<Portal>().ClippingPlanes(p.GetComponent<Portal>().cornertp, APlanes);
 
-                    p.GetComponent<Portal>().CreateClippingPlanes(p.GetComponent<Portal>().cornerout, p.GetComponent<Portal>().Planes, CamPoint);
+                    if (p.GetComponent<Portal>().cornerout.Count > 2)
+                    {
+                        p.GetComponent<Portal>().Planes.Clear();
 
-                    GetSector(p.GetComponent<Portal>().Planes, p.GetComponent<Portal>().TargetSector);
+                        p.GetComponent<Portal>().CreateClippingPlanes(p.GetComponent<Portal>().cornerout, p.GetComponent<Portal>().Planes, CamPoint);
+
+                        GetSector(p.GetComponent<Portal>().Planes, p.GetComponent<Portal>().TargetSector);
+                    }
                 }
             }
         }
