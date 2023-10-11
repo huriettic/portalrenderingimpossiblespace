@@ -123,14 +123,12 @@ namespace Portals
 
             foreach (GameObject sector in except)
             {
-                Physics.IgnoreCollision(Player, sector.GetComponent<Collider>(), true);
+                Physics.IgnoreCollision(Player, sector.GetComponent<MeshCollider>(), true);
             }
 
-            for (int i = 0; i < CurrentSector.GetComponent<Sector>().CheckSectors.Count; ++i)
+            foreach (GameObject sector in CurrentSector.GetComponent<Sector>().CheckSectors)
             {
-                GameObject Check = CurrentSector.GetComponent<Sector>().CheckSectors[i];
-
-                Physics.IgnoreCollision(Player, Check.GetComponent<Collider>(), false);
+                Physics.IgnoreCollision(Player, sector.GetComponent<MeshCollider>(), false);
             }
         }
 
