@@ -46,10 +46,9 @@ Shader "Custom/Clipping"
         {
             for (int i = 0; i < _Int; i++)
             {
-                float distance = dot(IN.worldPos, _Plane[i].xyz);
-                distance = distance + _Plane[i].w;
-                clip(distance + 0.05f);
-            }
+                float distance = dot(IN.worldPos, _Plane[i].xyz) + _Plane[i].w;
+                clip(distance + 0.15625f);
+    }
             // Albedo comes from a texture tinted by color
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
             o.Albedo = c.rgb;
