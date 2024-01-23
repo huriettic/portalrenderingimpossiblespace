@@ -4,6 +4,7 @@ namespace Portals
     using System.Collections.Generic;
     using System.Linq;
     using UnityEngine;
+    using UnityEngine.UI;
 
     public class Manager : MonoBehaviour
     {
@@ -19,7 +20,13 @@ namespace Portals
 
         public List<Plane> Planes = new List<Plane>(6);
 
+        public List<GameObject> Sectors = new List<GameObject>();
+
         public List<GameObject> VisitedSector = new List<GameObject>();
+
+        public List<Vector3> cornerout = new List<Vector3>();
+
+        public List<float> m_Dists = new List<float>();
 
         public List<GameObject> AllSector = new List<GameObject>();
 
@@ -38,7 +45,9 @@ namespace Portals
         {
             Player.GetComponent<Move>().Controller();
 
-            CheckSector();
+            Sectors.Clear();
+  
+            CheckSector(CurrentSector);
 
             Planes.Clear();
 
@@ -87,7 +96,7 @@ namespace Portals
 
             for (int e = 0; e < PSector.GetComponent<Sector>().Planes.Count; e++)
             {
-                if (PSector.GetComponent<Sector>().Planes[e].GetDistanceToPoint(CamPoint) < -0.5)
+                if (PSector.GetComponent<Sector>().Planes[e].GetDistanceToPoint(CamPoint) < -0.6f)
                 {
                     PointIn = false;
                     break;
@@ -96,17 +105,107 @@ namespace Portals
             return PointIn;
         }
 
-        public void CheckSector()
+        public void CreateClippingPlanes(List<Vector3> aVertices, List<Plane> aList, Vector3 aViewPos)
         {
+            int count = aVertices.Count;
+            for (int i = 0; i < count; i++)
+            {
+                int j = (i + 1) % count;
+                var p1 = aVertices[i];
+                var p2 = aVertices[j];
+                var n = Vector3.Cross(p1 - p2, aViewPos - p2);
+                var l = n.magnitude;
+                if (l < 0.01f)
+                    continue;
+                aList.Add(new Plane(n / l, aViewPos));
+            }
+        }
+
+        public List<Vector3> ClippingPlane(List<Vector3> invertices, Plane aPlane, float aEpsilon = 0.001f)
+        {
+                m_Dists.Clear();
+                List<Vector3> outvertices = new List<Vector3>();
+                int count = invertices.Count;
+                if (m_Dists.Capacity < count)
+                    m_Dists.Capacity = count;
+                for (int i = 0; i < count; i++)
+                {
+                    Vector3 p = invertices[i];
+                    m_Dists.Add(aPlane.GetDistanceToPoint(p));
+                }
+                for (int i = 0; i < count; i++)
+                {
+                    int j = (i + 1) % count;
+                    float d1 = m_Dists[i];
+                    float d2 = m_Dists[j];
+                    Vector3 p1 = invertices[i];
+                    Vector3 p2 = invertices[j];
+                    bool split = d1 > aEpsilon;
+                    if (split)
+                    {
+                        outvertices.Add(p1);
+                    }
+                    else if (d1 > -aEpsilon)
+                    {
+                        // point on clipping plane so just keep it
+                        outvertices.Add(p1);
+                        continue;
+                    }
+                    // both points are on the same side of the plane
+                    if ((d2 > -aEpsilon && split) || (d2 < aEpsilon && !split))
+                    {
+                        continue;
+                    }
+                    float d = d1 / (d1 - d2);
+                    outvertices.Add(p1 + (p2 - p1) * d);
+                }
+            return outvertices;
+        }
+
+        public List<Vector3> ClippingPlanes(List<Vector3> invertices, List<Plane> aPlanes)
+        {
+            for (int i = 0; i < aPlanes.Count; i++)
+            {
+                invertices = ClippingPlane(invertices, aPlanes[i]);
+            }
+            return invertices;
+        }
+
+        public void GetSectors(GameObject ASector)
+        {
+            Sectors.Add(ASector);
+
+            for (int i = 0; i < ASector.GetComponent<Sector>().OutPortals.Count; ++i)
+            {
+                GameObject p = ASector.GetComponent<Sector>().OutPortals[i];
+
+                bool t = CheckRadius(p.GetComponent<Portal>().TargetSector);
+
+                if (Sectors.Contains(p.GetComponent<Portal>().TargetSector))
+                {
+                    continue;
+                }
+
+                if (t == true)
+                {
+                    GetSectors(p.GetComponent<Portal>().TargetSector);
+                }
+            }
+        }
+
+        public void CheckSector(GameObject Current)
+        {
+            GetSectors(Current);
+
             Vector3 CamPoint = Cam.transform.position;
 
-            for (int i = 0; i < CurrentSector.GetComponent<Sector>().CheckSectors.Count; i++)
+            for (int i = 0; i < Sectors.Count; i++)
             {
                 bool PointIn = true;
 
-                for (int e = 0; e < CurrentSector.GetComponent<Sector>().CheckSectors[i].GetComponent<Sector>().Planes.Count; e++)
+                for (int e = 0; e < Sectors[i].GetComponent<Sector>().Planes.Count; e++)
                 {
-                    if (CurrentSector.GetComponent<Sector>().CheckSectors[i].GetComponent<Sector>().Planes[e].GetDistanceToPoint(CamPoint) < 0)
+                    if (Sectors[i].GetComponent<Sector>().Planes[e].GetDistanceToPoint(CamPoint) < 0)
                     {
                         PointIn = false;
                         break;
@@ -115,18 +214,18 @@ namespace Portals
 
                 if (PointIn == true)
                 {
-                    CurrentSector = CurrentSector.GetComponent<Sector>().CheckSectors[i];
+                    CurrentSector = Sectors[i];
                 }
             }
 
-            IEnumerable<GameObject> except = AllSector.Except(CurrentSector.GetComponent<Sector>().CheckSectors);
+            IEnumerable<GameObject> except = AllSector.Except(Sectors);
 
             foreach (GameObject sector in except)
             {
                 Physics.IgnoreCollision(Player, sector.GetComponent<MeshCollider>(), true);
             }
 
-            foreach (GameObject sector in CurrentSector.GetComponent<Sector>().CheckSectors)
+            foreach (GameObject sector in Sectors)
             {
                 Physics.IgnoreCollision(Player, sector.GetComponent<MeshCollider>(), false);
             }
@@ -159,8 +258,6 @@ namespace Portals
 
                 float d = p.GetComponent<Portal>().portalPlane.GetDistanceToPoint(CamPoint);
 
-                bool t = CheckRadius(p.GetComponent<Portal>().TargetSector);
-
                 if (d < -0.1f)
                 {
                     continue;
@@ -171,7 +268,7 @@ namespace Portals
                     continue;
                 }
 
-                if (t == true)
+                if (Sectors.Contains(p.GetComponent<Portal>().TargetSector))
                 {
                     p.GetComponent<Portal>().Planes.Clear();
 
@@ -187,13 +284,13 @@ namespace Portals
 
                 if (d != 0)
                 {
-                    p.GetComponent<Portal>().cornerout = p.GetComponent<Portal>().ClippingPlanes(p.GetComponent<Portal>().cornertp, APlanes);
+                    cornerout = ClippingPlanes(p.GetComponent<Portal>().cornertp, APlanes);
 
-                    if (p.GetComponent<Portal>().cornerout.Count > 2)
+                    if (cornerout.Count > 2)
                     {
                         p.GetComponent<Portal>().Planes.Clear();
 
-                        p.GetComponent<Portal>().CreateClippingPlanes(p.GetComponent<Portal>().cornerout, p.GetComponent<Portal>().Planes, CamPoint);
+                        CreateClippingPlanes(cornerout, p.GetComponent<Portal>().Planes, CamPoint);
 
                         GetSector(p.GetComponent<Portal>().Planes, p.GetComponent<Portal>().TargetSector);
                     }

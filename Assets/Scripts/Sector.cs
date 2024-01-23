@@ -13,8 +13,6 @@ namespace Portals
 
         public List<int> triangles = new List<int>();
 
-        public List<GameObject> CheckSectors = new List<GameObject>();
-
         public List<GameObject> OutPortals = new List<GameObject>();
 
         // Start is called before the first frame update
