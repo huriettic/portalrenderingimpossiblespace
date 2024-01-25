@@ -5,7 +5,11 @@ namespace Portals
 
     public class Portal : MonoBehaviour
     {
+        public Plane PortalPlane;
+
         public GameObject TargetSector;
+
+        public List<Plane> PortalPlanes = new List<Plane>();
 
         public List<Vector3> corners = new List<Vector3>();
 

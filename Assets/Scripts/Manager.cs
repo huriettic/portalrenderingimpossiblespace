@@ -84,6 +84,12 @@ namespace Portals
 
                         AllSector[i].GetComponent<Sector>().Planes.Add(new Plane(p1, p2, p3));
                     }
+
+                    Vector3 portalp1 = AllSector[i].GetComponent<Sector>().OutPortals[e].GetComponent<Portal>().cornertp[AllSector[i].GetComponent<Sector>().OutPortals[e].GetComponent<Portal>().triangles[0]];
+                    Vector3 portalp2 = AllSector[i].GetComponent<Sector>().OutPortals[e].GetComponent<Portal>().cornertp[AllSector[i].GetComponent<Sector>().OutPortals[e].GetComponent<Portal>().triangles[1]];
+                    Vector3 portalp3 = AllSector[i].GetComponent<Sector>().OutPortals[e].GetComponent<Portal>().cornertp[AllSector[i].GetComponent<Sector>().OutPortals[e].GetComponent<Portal>().triangles[2]];
+
+                    AllSector[i].GetComponent<Sector>().OutPortals[e].GetComponent<Portal>().PortalPlane = new Plane(portalp1, portalp2, portalp3);
                 }
             }
         }
@@ -231,11 +237,6 @@ namespace Portals
             }
         }
 
-        public void CreatePortalPlane()
-        {
-
-        }
-
         public void GetSector(List<Plane> APlanes, GameObject BSector)
         {
             Vector3 CamPoint = Cam.transform.position;
@@ -261,15 +262,7 @@ namespace Portals
             {
                 GameObject p = BSector.GetComponent<Sector>().OutPortals[i];
 
-                Vector3 p1 = p.GetComponent<Portal>().cornertp[p.GetComponent<Portal>().triangles[0]];
-                Vector3 p2 = p.GetComponent<Portal>().cornertp[p.GetComponent<Portal>().triangles[1]];
-                Vector3 p3 = p.GetComponent<Portal>().cornertp[p.GetComponent<Portal>().triangles[2]];
-
-                Plane PortalPlane = new Plane(p1, p2, p3);
-
-                float d = PortalPlane.GetDistanceToPoint(CamPoint);
-
-                List<Plane> PortalPlanes = new List<Plane>();
+                float d = p.GetComponent<Portal>().PortalPlane.GetDistanceToPoint(CamPoint);
 
                 if (d < -0.1f)
                 {
@@ -283,12 +276,14 @@ namespace Portals
 
                 if (Sectors.Contains(p.GetComponent<Portal>().TargetSector))
                 {
+                    p.GetComponent<Portal>().PortalPlanes.Clear();
+
                     for (int n = 0; n < APlanes.Count; n++)
                     {
-                        PortalPlanes.Add(APlanes[n]);
+                        p.GetComponent<Portal>().PortalPlanes.Add(APlanes[n]);
                     }
                         
-                    GetSector(PortalPlanes, p.GetComponent<Portal>().TargetSector);
+                    GetSector(p.GetComponent<Portal>().PortalPlanes, p.GetComponent<Portal>().TargetSector);
 
                     continue;
                 }
@@ -299,9 +294,11 @@ namespace Portals
 
                     if (cornerout.Count > 2)
                     {
-                        CreateClippingPlanes(cornerout, PortalPlanes, CamPoint);
+                        p.GetComponent<Portal>().PortalPlanes.Clear();
 
-                        GetSector(PortalPlanes, p.GetComponent<Portal>().TargetSector);
+                        CreateClippingPlanes(cornerout, p.GetComponent<Portal>().PortalPlanes, CamPoint);
+
+                        GetSector(p.GetComponent<Portal>().PortalPlanes, p.GetComponent<Portal>().TargetSector);
                     }
                 }
             }
