@@ -258,6 +258,8 @@ namespace Portals
 
                 float d = p.GetComponent<Portal>().portalPlane.GetDistanceToPoint(CamPoint);
 
+                List<Plane> PortalPlanes = new List<Plane>();
+
                 if (d < -0.1f)
                 {
                     continue;
@@ -270,14 +272,12 @@ namespace Portals
 
                 if (Sectors.Contains(p.GetComponent<Portal>().TargetSector))
                 {
-                    p.GetComponent<Portal>().Planes.Clear();
-
                     for (int n = 0; n < APlanes.Count; n++)
                     {
-                        p.GetComponent<Portal>().Planes.Add(APlanes[n]);
+                        PortalPlanes.Add(APlanes[n]);
                     }
                         
-                    GetSector(p.GetComponent<Portal>().Planes, p.GetComponent<Portal>().TargetSector);
+                    GetSector(PortalPlanes, p.GetComponent<Portal>().TargetSector);
 
                     continue;
                 }
@@ -288,11 +288,9 @@ namespace Portals
 
                     if (cornerout.Count > 2)
                     {
-                        p.GetComponent<Portal>().Planes.Clear();
+                        CreateClippingPlanes(cornerout, PortalPlanes, CamPoint);
 
-                        CreateClippingPlanes(cornerout, p.GetComponent<Portal>().Planes, CamPoint);
-
-                        GetSector(p.GetComponent<Portal>().Planes, p.GetComponent<Portal>().TargetSector);
+                        GetSector(PortalPlanes, p.GetComponent<Portal>().TargetSector);
                     }
                 }
             }

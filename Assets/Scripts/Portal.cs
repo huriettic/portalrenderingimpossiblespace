@@ -9,8 +9,6 @@ namespace Portals
 
         public GameObject TargetSector;
 
-        public List<Plane> Planes = new List<Plane>();
-
         public List<Vector3> corners = new List<Vector3>();
 
         public List<Vector3> cornertp = new List<Vector3>();
