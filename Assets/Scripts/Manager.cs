@@ -231,6 +231,11 @@ namespace Portals
             }
         }
 
+        public void CreatePortalPlane()
+        {
+
+        }
+
         public void GetSector(List<Plane> APlanes, GameObject BSector)
         {
             Vector3 CamPoint = Cam.transform.position;
@@ -256,7 +261,13 @@ namespace Portals
             {
                 GameObject p = BSector.GetComponent<Sector>().OutPortals[i];
 
-                float d = p.GetComponent<Portal>().portalPlane.GetDistanceToPoint(CamPoint);
+                Vector3 p1 = p.GetComponent<Portal>().cornertp[p.GetComponent<Portal>().triangles[0]];
+                Vector3 p2 = p.GetComponent<Portal>().cornertp[p.GetComponent<Portal>().triangles[1]];
+                Vector3 p3 = p.GetComponent<Portal>().cornertp[p.GetComponent<Portal>().triangles[2]];
+
+                Plane PortalPlane = new Plane(p1, p2, p3);
+
+                float d = PortalPlane.GetDistanceToPoint(CamPoint);
 
                 List<Plane> PortalPlanes = new List<Plane>();
 

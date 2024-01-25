@@ -5,8 +5,6 @@ namespace Portals
 
     public class Portal : MonoBehaviour
     {
-        public Plane portalPlane;
-
         public GameObject TargetSector;
 
         public List<Vector3> corners = new List<Vector3>();
@@ -19,8 +17,6 @@ namespace Portals
         void Awake()
         {
             SetMesh();
-
-            portalPlane = new Plane(cornertp[0], cornertp[1], cornertp[2]);
         }
 
         public void SetMesh()
