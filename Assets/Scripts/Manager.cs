@@ -26,6 +26,8 @@ namespace Portals
 
         public List<Vector3> cornerout = new List<Vector3>();
 
+        public List<Vector3> outvertices = new List<Vector3>();
+
         public List<float> m_Dists = new List<float>();
 
         public List<GameObject> AllSector = new List<GameObject>();
@@ -130,7 +132,7 @@ namespace Portals
         public List<Vector3> ClippingPlane(List<Vector3> invertices, Plane aPlane, float aEpsilon = 0.001f)
         {
                 m_Dists.Clear();
-                List<Vector3> outvertices = new List<Vector3>();
+                outvertices.Clear();
                 int count = invertices.Count;
                 if (m_Dists.Capacity < count)
                     m_Dists.Capacity = count;
@@ -172,7 +174,7 @@ namespace Portals
         {
             for (int i = 0; i < aPlanes.Count; i++)
             {
-                invertices = ClippingPlane(invertices, aPlanes[i]);
+                invertices = new List<Vector3>(ClippingPlane(invertices, aPlanes[i]));
             }
             return invertices;
         }
